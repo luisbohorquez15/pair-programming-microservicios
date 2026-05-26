@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PairCode — Programación Colaborativa</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0a0a0f;
+    --surface:#13131a;
+    --surface2:#1c1c26;
+    --border:#2a2a3a;
+    --accent:#7c6af7;
+    --accent2:#4ecdc4;
+    --danger:#ff6b6b;
+    --success:#51cf66;
+    --warn:#ffd43b;
+    --text:#e8e8f0;
+    --muted:#6b6b80;
+    --font:'Syne',sans-serif;
+    --mono:'JetBrains Mono',monospace;
+  }
+  body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
+  body::before{
+    content:'';position:fixed;inset:0;
+    background-image:linear-gradient(rgba(124,106,247,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,106,247,0.03) 1px,transparent 1px);
+    background-size:40px 40px;pointer-events:none;z-index:0
+  }
+  .app{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px}
+  header{display:flex;align-items:center;justify-content:space-between;padding:24px 0 32px;border-bottom:1px solid var(--border)}
+  .logo{font-size:22px;font-weight:800;letter-spacing:-0.5px}
+  .logo span{color:var(--accent)}
+  .status-bar{display:flex;gap:12px;align-items:center}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success);animation:pulse 2s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  .status-text{font-size:13px;color:var(--muted);font-family:var(--mono)}
+  .nav{display:flex;gap:4px;padding:24px 0 0}
+  .tab{padding:10px 20px;border-radius:8px 8px 0 0;font-size:14px;font-weight:600;cursor:pointer;border:1px solid transparent;border-bottom:none;background:transparent;color:var(--muted);transition:all .2s;font-family:var(--font)}
+  .tab.active{background:var(--surface);border-color:var(--border);color:var(--text)}
+  .tab:hover:not(.active){color:var(--text)}
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:0 12px 12px 12px;padding:32px;display:none;animation:fadeIn .2s ease}
+  .panel.active{display:block}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+  .form-group{margin-bottom:20px}
+  label{display:block;font-size:13px;font-weight:600;color:var(--muted);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+  input,select,textarea{width:100%;padding:12px 16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:var(--mono);font-size:14px;outline:none;transition:border-color .2s}
+  input:focus,select:focus,textarea:focus{border-color:var(--accent)}
+  textarea{resize:vertical;min-height:120px;line-height:1.6}
+  .btn{padding:12px 24px;border-radius:8px;font-family:var(--font);font-weight:700;font-size:14px;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:8px}
+  .btn-primary{background:var(--accent);color:#fff}
+  .btn-primary:hover{background:#9d8df9;transform:translateY(-1px)}
+  .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
+  .btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+  .btn-danger{background:var(--danger);color:#fff}
+  .btn-success{background:var(--success);color:#0a0a0f}
+  .btn:active{transform:scale(.98)}
+  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+  .response{margin-top:20px;padding:16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-all;max-height:280px;overflow-y:auto;display:none}
+  .response.success{border-color:var(--success)}
+  .response.error{border-color:var(--danger)}
+  .response.visible{display:block}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+  @media(max-width:640px){.two-col{grid-template-columns:1fr}}
+  .sessions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:20px}
+  .session-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:20px;cursor:pointer;transition:all .2s}
+  .session-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+  .session-card h3{font-size:15px;font-weight:700;margin-bottom:6px}
+  .session-card .meta{font-size:12px;color:var(--muted);font-family:var(--mono)}
+  .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--mono);margin-top:10px}
+  .badge-python{background:#3572A5;color:#c8dfff}
+  .badge-js{background:#f1e05a;color:#3a3000}
+  .badge-java{background:#b07219;color:#ffd9aa}
+  .badge-other{background:var(--border);color:var(--muted)}
+  .editor-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .code-area{width:100%;min-height:240px;padding:20px;background:#0d0d14;border:1px solid var(--border);border-radius:10px;font-family:var(--mono);font-size:14px;color:#a9b1d6;line-height:1.8;resize:vertical}
+  .code-area:focus{border-color:var(--accent);outline:none}
+  .ai-result{background:linear-gradient(135deg,rgba(124,106,247,.1),rgba(78,205,196,.05));border:1px solid rgba(124,106,247,.3);border-radius:10px;padding:20px;margin-top:16px;display:none}
+  .ai-result.visible{display:block}
+  .ai-result-title{font-size:12px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+  .suggestion-item{padding:10px 0;border-bottom:1px solid rgba(255,255,255,.05);font-size:14px;line-height:1.6;font-family:var(--mono)}
+  .suggestion-item:last-child{border-bottom:none}
+  .cb-status{display:flex;align-items:center;gap:12px;padding:16px 20px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;margin-bottom:20px}
+  .cb-dot{width:12px;height:12px;border-radius:50%;transition:all .3s}
+  .cb-dot.closed{background:var(--success);box-shadow:0 0 10px var(--success)}
+  .cb-dot.open{background:var(--danger);box-shadow:0 0 10px var(--danger)}
+  .cb-label{font-size:14px;font-weight:600}
+  .user-chip{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:13px;font-family:var(--mono)}
+  .user-avatar{width:24px;height:24px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+  .divider{height:1px;background:var(--border);margin:24px 0}
+  #toast{position:fixed;bottom:24px;right:24px;padding:14px 20px;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:600;z-index:999;transform:translateY(80px);transition:transform .3s;pointer-events:none}
+  #toast.show{transform:translateY(0)}
+  #toast.success{background:var(--success);color:#0a0a0f}
+  #toast.error{background:var(--danger);color:#fff}
+  #toast.info{background:var(--accent);color:#fff}
+  .section-title{font-size:18px;font-weight:800;margin-bottom:6px}
+  .section-sub{font-size:14px;color:var(--muted);margin-bottom:24px}
+  .flex-row{display:flex;gap:12px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="logo">Pair<span>Code</span></div>
+    <div class="status-bar">
+      <div class="dot" id="serverDot"></div>
+      <span class="status-text" id="serverStatus">conectando...</span>
+      <div id="userChip" style="display:none" class="user-chip">
+        <div class="user-avatar" id="userAvatar">?</div>
+        <span id="userLabel">-</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="nav">
+    <button class="tab active" onclick="showTab('auth')">🔐 Cuenta</button>
+    <button class="tab" onclick="showTab('sessions')">📁 Sesiones</button>
+    <button class="tab" onclick="showTab('editor')">💻 Editor</button>
+    <button class="tab" onclick="showTab('ai')">🤖 IA & CB</button>
+  </div>
+
+  <!-- AUTH -->
+  <div class="panel active" id="panel-auth">
+    <div class="two-col">
+      <div>
+        <div class="section-title">Registro</div>
+        <div class="section-sub">Crea una cuenta nueva</div>
+        <div class="form-group"><label>Usuario</label><input id="reg-user" placeholder="ej: luis123" /></div>
+        <div class="form-group"><label>Contraseña</label><input id="reg-pass" type="password" placeholder="••••••••" /></div>
+        <div class="form-group">
+          <label>Rol</label>
+          <select id="reg-role">
+            <option value="student">Estudiante</option>
+            <option value="teacher">Profesor</option>
+            <option value="admin">Admin</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="register()">Registrarse</button>
+        <div class="response" id="reg-res"></div>
+      </div>
+      <div>
+        <div class="section-title">Login</div>
+        <div class="section-sub">Inicia sesión con tu cuenta</div>
+        <div class="form-group"><label>Usuario</label><input id="login-user" placeholder="tu usuario" /></div>
+        <div class="form-group"><label>Contraseña</label><input id="login-pass" type="password" placeholder="••••••••" /></div>
+        <button class="btn btn-primary" onclick="login()">Iniciar sesión</button>
+        <div class="response" id="login-res"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SESSIONS -->
+  <div class="panel" id="panel-sessions">
+    <div class="two-col">
+      <div>
+        <div class="section-title">Nueva sesión</div>
+        <div class="section-sub">Crea una sala de programación</div>
+        <div class="form-group"><label>Nombre</label><input id="sess-name" placeholder="ej: Taller de Python" /></div>
+        <div class="form-group">
+          <label>Lenguaje</label>
+          <select id="sess-lang">
+            <option value="python">Python</option>
+            <option value="javascript">JavaScript</option>
+            <option value="java">Java</option>
+            <option value="other">Otro</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" onclick="createSession()">Crear sesión</button>
+        <div class="response" id="sess-res"></div>
+      </div>
+      <div>
+        <div class="section-title">Unirse a sesión</div>
+        <div class="section-sub">Ingresa con un ID de sesión</div>
+        <div class="form-group"><label>ID de sesión</label><input id="join-id" placeholder="uuid de la sesión" /></div>
+        <button class="btn btn-secondary" onclick="joinSession()">Unirse</button>
+        <div class="response" id="join-res"></div>
+      </div>
+    </div>
+    <div class="divider"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between">
+      <div class="section-title">Sesiones activas</div>
+      <button class="btn btn-secondary" onclick="loadSessions()">↻ Actualizar</button>
+    </div>
+    <div class="sessions-grid" id="sessions-grid">
+      <div style="color:var(--muted);font-size:14px;padding:20px 0">Carga las sesiones con el botón ↻</div>
+    </div>
+  </div>
+
+  <!-- EDITOR -->
+  <div class="panel" id="panel-editor">
+    <div class="section-title">Editor colaborativo</div>
+    <div class="section-sub">Escribe código y guárdalo en tu sesión activa</div>
+    <div class="form-group"><label>ID de sesión activa</label><input id="edit-session-id" placeholder="Pega aquí el ID de sesión" /></div>
+    <div class="editor-header">
+      <label style="margin:0;font-size:13px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.5px">Código</label>
+      <div class="flex-row">
+        <button class="btn btn-secondary" onclick="loadCode()">↓ Cargar código</button>
+        <button class="btn btn-primary" onclick="saveCode()">↑ Guardar</button>
+      </div>
+    </div>
+    <textarea class="code-area" id="code-editor" placeholder="# Escribe tu código aquí&#10;def hola():&#10;    print('Hola mundo!')"></textarea>
+    <div class="response" id="editor-res"></div>
+  </div>
+
+  <!-- AI -->
+  <div class="panel" id="panel-ai">
+    <div class="two-col">
+      <div>
+        <div class="section-title">Análisis de IA</div>
+        <div class="section-sub">Envía código para obtener sugerencias</div>
+        <div class="form-group"><label>ID de sesión</label><input id="ai-session-id" placeholder="uuid de la sesión" /></div>
+        <div class="form-group"><label>Código a analizar</label><textarea id="ai-code" placeholder="# Pega tu código aquí"></textarea></div>
+        <div class="form-group"><label>Pregunta (opcional)</label><input id="ai-question" placeholder="¿Cómo optimizo esto?" /></div>
+        <button class="btn btn-primary" onclick="analyzeCode()">Analizar con IA</button>
+        <div class="ai-result" id="ai-result">
+          <div class="ai-result-title">🤖 Sugerencias</div>
+          <div id="ai-suggestions"></div>
+        </div>
+      </div>
+      <div>
+        <div class="section-title">Circuit Breaker</div>
+        <div class="section-sub">Simula fallos y degradación aceptable</div>
+        <div class="cb-status">
+          <div class="cb-dot closed" id="cb-dot"></div>
+          <div>
+            <div class="cb-label" id="cb-label">Cerrado — IA operativa</div>
+            <div style="font-size:12px;color:var(--muted);margin-top:2px">Estado del circuit breaker</div>
+          </div>
+        </div>
+        <div class="flex-row" style="margin-bottom:16px">
+          <button class="btn btn-danger" onclick="openCB()">⚡ Abrir (simular fallo)</button>
+          <button class="btn btn-success" onclick="closeCB()">✓ Cerrar (restaurar)</button>
+        </div>
+        <div style="padding:16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--muted);line-height:1.7">
+          <strong style="color:var(--text)">¿Qué hace el Circuit Breaker?</strong><br><br>
+          Cuando está <span style="color:var(--danger)">abierto</span>, el AI Service simula un fallo pero responde con análisis local como degradación aceptable.<br><br>
+          Cuando está <span style="color:var(--success)">cerrado</span>, opera normalmente.
+        </div>
+        <div class="response" id="cb-res"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const API = 'http://localhost:8000';
+let currentUser = null;
+let currentToken = null;
+
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const tabs = ['auth','sessions','editor','ai'];
+    t.classList.toggle('active', tabs[i] === name);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+function toast(msg, type='info') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show ' + type;
+  setTimeout(() => t.className = '', 2800);
+}
+
+function showRes(id, data, isError=false) {
+  const el = document.getElementById(id);
+  el.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+  el.className = 'response visible ' + (isError ? 'error' : 'success');
+}
+
+async function apiFetch(path, method='GET', body=null) {
+  const opts = { method, headers: {'Content-Type':'application/json'} };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API + path, opts);
+  const data = await r.json();
+  if (!r.ok) throw data;
+  return data;
+}
+
+async function checkServer() {
+  try {
+    await apiFetch('/health');
+    document.getElementById('serverDot').style.background = 'var(--success)';
+    document.getElementById('serverDot').style.boxShadow = '0 0 8px var(--success)';
+    document.getElementById('serverStatus').textContent = 'todos los servicios OK';
+  } catch(e) {
+    document.getElementById('serverDot').style.background = 'var(--danger)';
+    document.getElementById('serverDot').style.boxShadow = '0 0 8px var(--danger)';
+    document.getElementById('serverStatus').textContent = 'sin conexion con el servidor';
+  }
+}
+
+function updateUserChip() {
+  if (!currentUser) return;
+  const chip = document.getElementById('userChip');
+  chip.style.display = 'inline-flex';
+  document.getElementById('userAvatar').textContent = currentUser[0].toUpperCase();
+  document.getElementById('userLabel').textContent = currentUser;
+}
+
+async function register() {
+  const username = document.getElementById('reg-user').value.trim();
+  const password = document.getElementById('reg-pass').value;
+  const role = document.getElementById('reg-role').value;
+  if (!username || !password) { toast('Completa todos los campos','error'); return; }
+  try {
+    const data = await apiFetch('/api/auth/register','POST',{username,password,role});
+    showRes('reg-res', data);
+    toast('Usuario registrado correctamente','success');
+  } catch(e) { showRes('reg-res', e, true); toast('Error al registrar','error'); }
+}
+
+async function login() {
+  const username = document.getElementById('login-user').value.trim();
+  const password = document.getElementById('login-pass').value;
+  if (!username || !password) { toast('Completa todos los campos','error'); return; }
+  try {
+    const data = await apiFetch('/api/auth/login','POST',{username,password});
+    currentUser = data.username;
+    currentToken = data.token;
+    updateUserChip();
+    showRes('login-res', data);
+    toast('Bienvenido ' + username,'success');
+  } catch(e) { showRes('login-res', e, true); toast('Credenciales incorrectas','error'); }
+}
+
+async function createSession() {
+  const name = document.getElementById('sess-name').value.trim();
+  const language = document.getElementById('sess-lang').value;
+  const owner = currentUser || 'anonimo';
+  if (!name) { toast('Escribe un nombre para la sesion','error'); return; }
+  try {
+    const data = await apiFetch('/api/sessions','POST',{name,owner,language});
+    showRes('sess-res', data);
+    toast('Sesion creada correctamente','success');
+    const id = data.session?.id || '';
+    if (id) {
+      document.getElementById('edit-session-id').value = id;
+      document.getElementById('ai-session-id').value = id;
+      document.getElementById('join-id').value = id;
+    }
+  } catch(e) { showRes('sess-res', e, true); toast('Error al crear sesion','error'); }
+}
+
+async function joinSession() {
+  const session_id = document.getElementById('join-id').value.trim();
+  const username = currentUser || 'anonimo';
+  if (!session_id) { toast('Ingresa el ID de sesion','error'); return; }
+  try {
+    const data = await apiFetch('/api/sessions/'+session_id+'/join','POST',{username});
+    showRes('join-res', data);
+    toast('Te uniste a la sesion correctamente','success');
+    document.getElementById('edit-session-id').value = session_id;
+    document.getElementById('ai-session-id').value = session_id;
+  } catch(e) { showRes('join-res', e, true); toast('Error al unirse','error'); }
+}
+
+async function loadSessions() {
+  try {
+    const data = await apiFetch('/api/sessions');
+    const grid = document.getElementById('sessions-grid');
+    if (!data.sessions || data.sessions.length === 0) {
+      grid.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:20px 0">No hay sesiones aun. Crea una!</div>';
+      return;
+    }
+    grid.innerHTML = data.sessions.map(s => {
+      const langClass = {python:'badge-python',javascript:'badge-js',java:'badge-java'}[s.language] || 'badge-other';
+      const parts = s.participants ? (typeof s.participants === 'string' ? JSON.parse(s.participants) : s.participants) : [];
+      return `<div class="session-card" onclick="selectSession('${s.id}')">
+        <h3>${s.name}</h3>
+        <div class="meta">Propietario: ${s.owner} · ${parts.length} participante(s)</div>
+        <div class="meta" style="margin-top:4px;font-size:11px;color:var(--muted)">${s.id.substring(0,8)}...</div>
+        <span class="badge ${langClass}">${s.language}</span>
+      </div>`;
+    }).join('');
+  } catch(e) { toast('Error al cargar sesiones','error'); }
+}
+
+function selectSession(id) {
+  document.getElementById('edit-session-id').value = id;
+  document.getElementById('ai-session-id').value = id;
+  showTab('editor');
+  toast('Sesion seleccionada, ve al Editor','info');
+}
+
+async function loadCode() {
+  const id = document.getElementById('edit-session-id').value.trim();
+  if (!id) { toast('Ingresa el ID de sesion','error'); return; }
+  try {
+    const data = await apiFetch('/api/sessions/'+id+'/code');
+    document.getElementById('code-editor').value = data.code || '';
+    showRes('editor-res', {message:'Codigo cargado',session_id:id});
+    toast('Codigo cargado correctamente','success');
+  } catch(e) { showRes('editor-res', e, true); toast('Error al cargar codigo','error'); }
+}
+
+async function saveCode() {
+  const session_id = document.getElementById('edit-session-id').value.trim();
+  const code = document.getElementById('code-editor').value;
+  const user = currentUser || 'anonimo';
+  if (!session_id) { toast('Ingresa el ID de sesion','error'); return; }
+  try {
+    const data = await apiFetch('/api/sessions/'+session_id+'/code','PUT',{session_id,user,code});
+    showRes('editor-res', data);
+    toast('Codigo guardado correctamente','success');
+  } catch(e) { showRes('editor-res', e, true); toast('Error al guardar','error'); }
+}
+
+async function analyzeCode() {
+  const session_id = document.getElementById('ai-session-id').value.trim();
+  const code = document.getElementById('ai-code').value.trim();
+  const question = document.getElementById('ai-question').value.trim();
+  const user = currentUser || 'anonimo';
+  if (!code) { toast('Escribe codigo para analizar','error'); return; }
+  try {
+    const data = await apiFetch('/api/ai/analyze','POST',{session_id:session_id||'demo',user,code,language:'python',question:question||null});
+    const parts = data.suggestion.split(' | ');
+    document.getElementById('ai-suggestions').innerHTML = parts.map(p =>
+      `<div class="suggestion-item">${p}</div>`
+    ).join('');
+    document.getElementById('ai-result').classList.add('visible');
+    toast('Analisis completado correctamente','success');
+  } catch(e) { toast('Error en analisis de IA','error'); }
+}
+
+async function openCB() {
+  try {
+    const data = await apiFetch('/api/ai/circuit-breaker/open','POST');
+    document.getElementById('cb-dot').className = 'cb-dot open';
+    document.getElementById('cb-label').textContent = 'Abierto — IA en modo degradado';
+    showRes('cb-res', data);
+    toast('Circuit breaker abierto, IA en modo degradado','error');
+  } catch(e) { toast('Error','error'); }
+}
+
+async function closeCB() {
+  try {
+    const data = await apiFetch('/api/ai/circuit-breaker/close','POST');
+    document.getElementById('cb-dot').className = 'cb-dot closed';
+    document.getElementById('cb-label').textContent = 'Cerrado — IA operativa';
+    showRes('cb-res', data);
+    toast('Circuit breaker restaurado, IA operativa','success');
+  } catch(e) { toast('Error','error'); }
+}
+
+checkServer();
+setInterval(checkServer, 10000);
+</script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+# 🖥️ PairCode — Plataforma de Programación Colaborativa
+
+Plataforma de programación colaborativa en tiempo real construida con arquitectura de microservicios usando FastAPI, Python 3.11, PostgreSQL, Docker y un frontend web incluido.
+
+
+## 🏗️ Arquitectura General
+
+Navegador (Frontend :3000)
+│
+▼
+API Gateway (:8000)
+│
+┌───────┼───────────┐
+▼       ▼           ▼
+Auth    Editor       AI
+(:8001) (:8002)    (:8003)
+│       │
+└───────┘
+│
+PostgreSQL (:5432)
+
+## Microservicios
+
+| Servicio | Puerto | Descripción |
+|----------|--------|-------------|
+| Frontend | 3000 | Interfaz web de usuario |
+| API Gateway | 8000 | Punto de entrada único |
+| Auth Service | 8001 | Registro y login de usuarios |
+| Editor Service | 8002 | Sesiones de programación colaborativa |
+| AI Service | 8003 | Análisis de código con Circuit Breaker |
+| PostgreSQL | 5432 | Base de datos persistente |
+
+
+## 🚀 Cómo levantar el proyecto
+
+### Requisitos previos
+- Docker Desktop instalado y corriendo
+- Git instalado
+
+### Pasos
+
+**1. Clonar el repositorio**
+```bash
+git clone https://github.com/TU_USUARIO/pair-programming-microservicios.git
+cd pair-programming-microservicios
+```
+
+**2. Levantar todos los servicios**
+```bash
+docker compose up --build
+```
+
+**3. Verificar que todo está corriendo**
+```bash
+docker compose ps
+```
+Deberías ver 6 contenedores activos: postgres, api-gateway, auth-service, editor-service, ai-service, frontend.
+
+**4. Abrir el frontend**
+
+Abre tu navegador en: http://localhost:3000
+
+---
+
+## Cómo probar el sistema
+
+### Desde el Frontend (recomendado)
+
+1. **Pestaña Cuenta** → Registra un usuario y luego inicia sesión
+2. **Pestaña Sesiones** → Crea una sesión de programación y únete a ella
+3. **Pestaña Editor** → Escribe código y guárdalo con el botón Guardar
+4. **Pestaña IA & CB** → Analiza código y prueba el Circuit Breaker
+
+### Desde Postman (API directa)
+
+| Método | URL | Descripción |
+|--------|-----|-------------|
+| GET | `http://localhost:8000/health` | Health check general |
+| POST | `http://localhost:8000/api/auth/register` | Registrar usuario |
+| POST | `http://localhost:8000/api/auth/login` | Login |
+| GET | `http://localhost:8000/api/auth/users` | Listar usuarios |
+| POST | `http://localhost:8000/api/sessions` | Crear sesión |
+| GET | `http://localhost:8000/api/sessions` | Listar sesiones |
+| POST | `http://localhost:8000/api/sessions/{id}/join` | Unirse a sesión |
+| PUT | `http://localhost:8000/api/sessions/{id}/code` | Actualizar código |
+| GET | `http://localhost:8000/api/sessions/{id}/code` | Ver código |
+| POST | `http://localhost:8000/api/ai/analyze` | Analizar código |
+| POST | `http://localhost:8000/api/ai/circuit-breaker/open` | Simular fallo |
+| POST | `http://localhost:8000/api/ai/circuit-breaker/close` | Restaurar servicio |
+
+---
+
+## 🏛️ Patrones de Arquitectura Aplicados
+
+### 1. API Gateway
+Punto de entrada único que enruta todas las peticiones a los microservicios correspondientes. El cliente nunca accede directamente a los servicios internos.
+
+### 2. Circuit Breaker
+El AI Service implementa un Circuit Breaker que detecta fallos y activa automáticamente un modo de degradación aceptable, garantizando que el sistema siga respondiendo aunque la IA falle.
+
+### 3. Database per Service
+Auth Service y Editor Service tienen sus propias tablas en PostgreSQL. Cada servicio es dueño de sus datos.
+
+### 4. Health Check
+Cada microservicio expone un endpoint `/health` que permite monitorear su estado en tiempo real.
+
+### 5. Containerization
+Cada servicio corre en su propio contenedor Docker aislado, comunicándose a través de una red interna.
+
+---
+
+## 🔧 Variables de entorno
+
+| Variable | Servicio | Descripción |
+|----------|----------|-------------|
+| `DATABASE_URL` | auth, editor | Conexión a PostgreSQL |
+| `SECRET_KEY` | auth | Clave para tokens |
+| `ANTHROPIC_API_KEY` | ai | Key de la API de Claude |
+| `ENV` | todos | Entorno de ejecución |
+
+---
+
+## 🛑 Cómo detener el proyecto
+
+```bash
+docker compose down
+```
+
+Para eliminar también los datos de PostgreSQL:
+```bash
+docker compose down -v
+```
+
+---
+
+## 📁 Estructura del proyecto
+
+pair-programming-microservicios/
+├── api-gateway/
+│   ├── main.py
+│   ├── requirements.txt
+│   └── Dockerfile
+├── auth-service/
+│   ├── main.py
+│   ├── requirements.txt
+│   └── Dockerfile
+├── editor-service/
+│   ├── main.py
+│   ├── requirements.txt
+│   └── Dockerfile
+├── ai-service/
+│   ├── main.py
+│   ├── requirements.txt
+│   └── Dockerfile
+├── frontend/
+│   └── index.html
+├── docker-compose.yml
+├── .env
+├── .env.example
+└── README.md

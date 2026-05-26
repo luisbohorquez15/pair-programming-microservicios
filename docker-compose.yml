@@ -1,0 +1,89 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: pairuser
+      POSTGRES_PASSWORD: pairpass
+      POSTGRES_DB: pairdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - pair-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pairuser -d pairdb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    ports:
+      - "8000:8000"
+    depends_on:
+      - auth-service
+      - editor-service
+      - ai-service
+    networks:
+      - pair-network
+    environment:
+      - ENV=development
+
+  auth-service:
+    build: ./auth-service
+    container_name: auth-service
+    ports:
+      - "8001:8001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pair-network
+    environment:
+      - DATABASE_URL=postgresql://pairuser:pairpass@postgres:5432/pairdb
+      - SECRET_KEY=supersecretkey123
+
+  editor-service:
+    build: ./editor-service
+    container_name: editor-service
+    ports:
+      - "8002:8002"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - pair-network
+    environment:
+      - DATABASE_URL=postgresql://pairuser:pairpass@postgres:5432/pairdb
+
+  ai-service:
+    build: ./ai-service
+    container_name: ai-service
+    ports:
+      - "8003:8003"
+    networks:
+      - pair-network
+    environment:
+      - ENV=development
+
+  frontend:
+    image: nginx:alpine
+    container_name: frontend
+    ports:
+      - "3000:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+    networks:
+      - pair-network
+    depends_on:
+      - api-gateway
+
+networks:
+  pair-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
