@@ -1,9 +1,9 @@
-# 🖥️ PairCode — Plataforma de Programación Colaborativa
+# PairCode — Plataforma de Programación Colaborativa
 
 Plataforma de programación colaborativa en tiempo real construida con arquitectura de microservicios usando FastAPI, Python 3.11, PostgreSQL, Docker y un frontend web incluido.
 
 
-## 🏗️ Arquitectura General
+## Arquitectura General
 
 Navegador (Frontend :3000)
 │
@@ -31,7 +31,7 @@ PostgreSQL (:5432)
 | PostgreSQL | 5432 | Base de datos persistente |
 
 
-## 🚀 Cómo levantar el proyecto
+## Cómo levantar el proyecto
 
 ### Requisitos previos
 - Docker Desktop instalado y corriendo
@@ -120,7 +120,7 @@ Cada servicio corre en su propio contenedor Docker aislado, comunicándose a tra
 
 ---
 
-## 🛑 Cómo detener el proyecto
+## Cómo detener el proyecto
 
 ```bash
 docker compose down
@@ -133,7 +133,7 @@ docker compose down -v
 
 ---
 
-## 📁 Estructura del proyecto
+## Estructura del proyecto
 
 pair-programming-microservicios/
 ├── api-gateway/
