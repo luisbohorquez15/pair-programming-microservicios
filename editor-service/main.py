@@ -144,3 +144,18 @@ def get_code(session_id: str):
     if not row:
         raise HTTPException(status_code=404, detail="Sesión no encontrada")
     return {"session_id": session_id, "code": row["code"]}
+
+@app.delete("/sessions/{session_id}")
+def delete_session(session_id: str):
+    conn = get_connection()
+    cur = conn.cursor()
+    cur.execute("SELECT id FROM sessions WHERE id = %s", (session_id,))
+    if not cur.fetchone():
+        cur.close()
+        conn.close()
+        raise HTTPException(status_code=404, detail="Sesión no encontrada")
+    cur.execute("DELETE FROM sessions WHERE id = %s", (session_id,))
+    conn.commit()
+    cur.close()
+    conn.close()
+    return {"message": "Sesión eliminada correctamente", "session_id": session_id}

@@ -4,35 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>PairCode — Programación Colaborativa</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   *{margin:0;padding:0;box-sizing:border-box}
-  :root{
-    --bg:#0a0a0f;
-    --surface:#13131a;
-    --surface2:#1c1c26;
-    --border:#2a2a3a;
-    --accent:#7c6af7;
-    --accent2:#4ecdc4;
-    --danger:#ff6b6b;
-    --success:#51cf66;
-    --warn:#ffd43b;
-    --text:#e8e8f0;
-    --muted:#6b6b80;
-    --font:'Syne',sans-serif;
-    --mono:'JetBrains Mono',monospace;
-  }
-  body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh;overflow-x:hidden}
-  body::before{
-    content:'';position:fixed;inset:0;
-    background-image:linear-gradient(rgba(124,106,247,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,106,247,0.03) 1px,transparent 1px);
-    background-size:40px 40px;pointer-events:none;z-index:0
-  }
+  :root{--bg:#0a0a0f;--surface:#13131a;--surface2:#1c1c26;--border:#2a2a3a;--accent:#7c6af7;--accent2:#4ecdc4;--danger:#ff6b6b;--success:#51cf66;--text:#e8e8f0;--muted:#6b6b80;--font:'Syne',sans-serif;--mono:'JetBrains Mono',monospace}
+  body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100vh}
+  body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(124,106,247,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,106,247,0.03) 1px,transparent 1px);background-size:40px 40px;pointer-events:none;z-index:0}
   .app{position:relative;z-index:1;max-width:1100px;margin:0 auto;padding:0 24px}
   header{display:flex;align-items:center;justify-content:space-between;padding:24px 0 32px;border-bottom:1px solid var(--border)}
-  .logo{font-size:22px;font-weight:800;letter-spacing:-0.5px}
-  .logo span{color:var(--accent)}
+  .logo{font-size:22px;font-weight:800}.logo span{color:var(--accent)}
   .status-bar{display:flex;gap:12px;align-items:center}
   .dot{width:8px;height:8px;border-radius:50%;background:var(--success);box-shadow:0 0 8px var(--success);animation:pulse 2s infinite}
   @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
@@ -40,7 +20,6 @@
   .nav{display:flex;gap:4px;padding:24px 0 0}
   .tab{padding:10px 20px;border-radius:8px 8px 0 0;font-size:14px;font-weight:600;cursor:pointer;border:1px solid transparent;border-bottom:none;background:transparent;color:var(--muted);transition:all .2s;font-family:var(--font)}
   .tab.active{background:var(--surface);border-color:var(--border);color:var(--text)}
-  .tab:hover:not(.active){color:var(--text)}
   .panel{background:var(--surface);border:1px solid var(--border);border-radius:0 12px 12px 12px;padding:32px;display:none;animation:fadeIn .2s ease}
   .panel.active{display:block}
   @keyframes fadeIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
@@ -50,31 +29,27 @@
   input:focus,select:focus,textarea:focus{border-color:var(--accent)}
   textarea{resize:vertical;min-height:120px;line-height:1.6}
   .btn{padding:12px 24px;border-radius:8px;font-family:var(--font);font-weight:700;font-size:14px;cursor:pointer;border:none;transition:all .15s;display:inline-flex;align-items:center;gap:8px}
-  .btn-primary{background:var(--accent);color:#fff}
-  .btn-primary:hover{background:#9d8df9;transform:translateY(-1px)}
-  .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}
-  .btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
+  .btn-primary{background:var(--accent);color:#fff}.btn-primary:hover{background:#9d8df9;transform:translateY(-1px)}
+  .btn-secondary{background:var(--surface2);color:var(--text);border:1px solid var(--border)}.btn-secondary:hover{border-color:var(--accent);color:var(--accent)}
   .btn-danger{background:var(--danger);color:#fff}
   .btn-success{background:var(--success);color:#0a0a0f}
+  .btn-google{background:#fff;color:#333;border:1px solid #ddd}.btn-google:hover{background:#f5f5f5}
   .btn:active{transform:scale(.98)}
-  .btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
   .response{margin-top:20px;padding:16px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-family:var(--mono);font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-all;max-height:280px;overflow-y:auto;display:none}
-  .response.success{border-color:var(--success)}
-  .response.error{border-color:var(--danger)}
-  .response.visible{display:block}
+  .response.success{border-color:var(--success)}.response.error{border-color:var(--danger)}.response.visible{display:block}
   .two-col{display:grid;grid-template-columns:1fr 1fr;gap:24px}
   @media(max-width:640px){.two-col{grid-template-columns:1fr}}
   .sessions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:20px}
-  .session-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:20px;cursor:pointer;transition:all .2s}
+  .session-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:20px;cursor:pointer;transition:all .2s;position:relative}
   .session-card:hover{border-color:var(--accent);transform:translateY(-2px)}
   .session-card h3{font-size:15px;font-weight:700;margin-bottom:6px}
   .session-card .meta{font-size:12px;color:var(--muted);font-family:var(--mono)}
   .badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--mono);margin-top:10px}
-  .badge-python{background:#3572A5;color:#c8dfff}
-  .badge-js{background:#f1e05a;color:#3a3000}
-  .badge-java{background:#b07219;color:#ffd9aa}
-  .badge-other{background:var(--border);color:var(--muted)}
-  .editor-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .badge-python{background:#3572A5;color:#c8dfff}.badge-js{background:#f1e05a;color:#3a3000}.badge-java{background:#b07219;color:#ffd9aa}.badge-other{background:var(--border);color:var(--muted)}
+  .role-badge{display:inline-flex;align-items:center;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;font-family:var(--mono);margin-left:8px}
+  .role-student{background:rgba(78,205,196,.15);color:var(--accent2);border:1px solid rgba(78,205,196,.3)}
+  .role-teacher{background:rgba(124,106,247,.15);color:var(--accent);border:1px solid rgba(124,106,247,.3)}
+  .role-admin{background:rgba(255,107,107,.15);color:var(--danger);border:1px solid rgba(255,107,107,.3)}
   .code-area{width:100%;min-height:240px;padding:20px;background:#0d0d14;border:1px solid var(--border);border-radius:10px;font-family:var(--mono);font-size:14px;color:#a9b1d6;line-height:1.8;resize:vertical}
   .code-area:focus{border-color:var(--accent);outline:none}
   .ai-result{background:linear-gradient(135deg,rgba(124,106,247,.1),rgba(78,205,196,.05));border:1px solid rgba(124,106,247,.3);border-radius:10px;padding:20px;margin-top:16px;display:none}
@@ -88,8 +63,11 @@
   .cb-dot.open{background:var(--danger);box-shadow:0 0 10px var(--danger)}
   .cb-label{font-size:14px;font-weight:600}
   .user-chip{display:inline-flex;align-items:center;gap:8px;padding:6px 14px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;font-size:13px;font-family:var(--mono)}
-  .user-avatar{width:24px;height:24px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff}
+  .user-avatar{width:28px;height:28px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;overflow:hidden}
+  .user-avatar img{width:100%;height:100%;object-fit:cover}
   .divider{height:1px;background:var(--border);margin:24px 0}
+  .divider-text{display:flex;align-items:center;gap:12px;margin:20px 0;color:var(--muted);font-size:13px}
+  .divider-text::before,.divider-text::after{content:'';flex:1;height:1px;background:var(--border)}
   #toast{position:fixed;bottom:24px;right:24px;padding:14px 20px;border-radius:10px;font-family:var(--font);font-size:14px;font-weight:600;z-index:999;transform:translateY(80px);transition:transform .3s;pointer-events:none}
   #toast.show{transform:translateY(0)}
   #toast.success{background:var(--success);color:#0a0a0f}
@@ -98,6 +76,16 @@
   .section-title{font-size:18px;font-weight:800;margin-bottom:6px}
   .section-sub{font-size:14px;color:var(--muted);margin-bottom:24px}
   .flex-row{display:flex;gap:12px;flex-wrap:wrap}
+  .editor-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .admin-panel{background:rgba(255,107,107,.05);border:1px solid rgba(255,107,107,.2);border-radius:10px;padding:20px;margin-top:20px}
+  .admin-panel-title{font-size:13px;font-weight:700;color:var(--danger);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+  .teacher-panel{background:rgba(124,106,247,.05);border:1px solid rgba(124,106,247,.2);border-radius:10px;padding:20px;margin-top:20px}
+  .teacher-panel-title{font-size:13px;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
+  .users-table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:13px}
+  .users-table th{text-align:left;padding:10px 12px;border-bottom:1px solid var(--border);color:var(--muted);font-size:11px;text-transform:uppercase}
+  .users-table td{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.05)}
+  .delete-btn{padding:4px 10px;background:rgba(255,107,107,.2);color:var(--danger);border:1px solid rgba(255,107,107,.3);border-radius:6px;font-size:11px;cursor:pointer;font-family:var(--mono)}
+  .delete-btn:hover{background:rgba(255,107,107,.4)}
 </style>
 </head>
 <body>
@@ -109,8 +97,10 @@
       <span class="status-text" id="serverStatus">conectando...</span>
       <div id="userChip" style="display:none" class="user-chip">
         <div class="user-avatar" id="userAvatar">?</div>
-        <span id="userLabel">-</span>
+        <span id="userLabel">–</span>
+        <span id="roleBadge" class="role-badge role-student">student</span>
       </div>
+      <button id="logoutBtn" style="display:none" class="btn btn-secondary" onclick="logout()" style="padding:6px 14px;font-size:12px">Salir</button>
     </div>
   </header>
 
@@ -121,14 +111,15 @@
     <button class="tab" onclick="showTab('ai')">🤖 IA & CB</button>
   </div>
 
-  <!-- AUTH -->
+  <!-- AUTH PANEL -->
   <div class="panel active" id="panel-auth">
     <div class="two-col">
       <div>
         <div class="section-title">Registro</div>
         <div class="section-sub">Crea una cuenta nueva</div>
         <div class="form-group"><label>Usuario</label><input id="reg-user" placeholder="ej: luis123" /></div>
-        <div class="form-group"><label>Contraseña</label><input id="reg-pass" type="password" placeholder="••••••••" /></div>
+        <div class="form-group"><label>Email</label><input id="reg-email" type="email" placeholder="correo@ejemplo.com" /></div>
+        <div class="form-group"><label>Contraseña</label><input id="reg-pass" type="password" placeholder="mínimo 6 caracteres" /></div>
         <div class="form-group">
           <label>Rol</label>
           <select id="reg-role">
@@ -143,15 +134,20 @@
       <div>
         <div class="section-title">Login</div>
         <div class="section-sub">Inicia sesión con tu cuenta</div>
-        <div class="form-group"><label>Usuario</label><input id="login-user" placeholder="tu usuario" /></div>
+        <div class="form-group"><label>Email</label><input id="login-email" type="email" placeholder="correo@ejemplo.com" /></div>
         <div class="form-group"><label>Contraseña</label><input id="login-pass" type="password" placeholder="••••••••" /></div>
         <button class="btn btn-primary" onclick="login()">Iniciar sesión</button>
+        <div class="divider-text">o</div>
+        <button class="btn btn-google" onclick="loginGoogle()" style="width:100%;justify-content:center;gap:10px">
+          <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/><path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17z"/><path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07z"/><path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3z"/></svg>
+          Continuar con Google
+        </button>
         <div class="response" id="login-res"></div>
       </div>
     </div>
   </div>
 
-  <!-- SESSIONS -->
+  <!-- SESSIONS PANEL -->
   <div class="panel" id="panel-sessions">
     <div class="two-col">
       <div>
@@ -180,15 +176,27 @@
     </div>
     <div class="divider"></div>
     <div style="display:flex;align-items:center;justify-content:space-between">
-      <div class="section-title">Sesiones activas</div>
+      <div class="section-title">Sesiones <span id="sessions-scope" style="font-size:14px;color:var(--muted);font-weight:400"></span></div>
       <button class="btn btn-secondary" onclick="loadSessions()">↻ Actualizar</button>
     </div>
     <div class="sessions-grid" id="sessions-grid">
       <div style="color:var(--muted);font-size:14px;padding:20px 0">Carga las sesiones con el botón ↻</div>
     </div>
+    <!-- Panel solo para teacher -->
+    <div class="teacher-panel" id="teacher-panel" style="display:none">
+      <div class="teacher-panel-title">📊 Panel Profesor — Lista de Usuarios</div>
+      <button class="btn btn-secondary" onclick="loadUsers()" style="margin-bottom:16px">Ver todos los usuarios</button>
+      <div id="users-container"></div>
+    </div>
+    <!-- Panel solo para admin -->
+    <div class="admin-panel" id="admin-panel" style="display:none">
+      <div class="admin-panel-title">⚙️ Panel Admin — Gestión completa</div>
+      <button class="btn btn-secondary" onclick="loadUsers()" style="margin-bottom:16px">Ver y gestionar usuarios</button>
+      <div id="admin-users-container"></div>
+    </div>
   </div>
 
-  <!-- EDITOR -->
+  <!-- EDITOR PANEL -->
   <div class="panel" id="panel-editor">
     <div class="section-title">Editor colaborativo</div>
     <div class="section-sub">Escribe código y guárdalo en tu sesión activa</div>
@@ -200,11 +208,11 @@
         <button class="btn btn-primary" onclick="saveCode()">↑ Guardar</button>
       </div>
     </div>
-    <textarea class="code-area" id="code-editor" placeholder="# Escribe tu código aquí&#10;def hola():&#10;    print('Hola mundo!')"></textarea>
+    <textarea class="code-area" id="code-editor" placeholder="# Escribe tu código aquí"></textarea>
     <div class="response" id="editor-res"></div>
   </div>
 
-  <!-- AI -->
+  <!-- AI PANEL -->
   <div class="panel" id="panel-ai">
     <div class="two-col">
       <div>
@@ -221,7 +229,7 @@
       </div>
       <div>
         <div class="section-title">Circuit Breaker</div>
-        <div class="section-sub">Simula fallos y degradación aceptable</div>
+        <div class="section-sub">Solo administradores pueden controlarlo</div>
         <div class="cb-status">
           <div class="cb-dot closed" id="cb-dot"></div>
           <div>
@@ -229,14 +237,14 @@
             <div style="font-size:12px;color:var(--muted);margin-top:2px">Estado del circuit breaker</div>
           </div>
         </div>
-        <div class="flex-row" style="margin-bottom:16px">
-          <button class="btn btn-danger" onclick="openCB()">⚡ Abrir (simular fallo)</button>
-          <button class="btn btn-success" onclick="closeCB()">✓ Cerrar (restaurar)</button>
+        <div id="cb-controls" style="display:none">
+          <div class="flex-row" style="margin-bottom:16px">
+            <button class="btn btn-danger" onclick="openCB()">⚡ Abrir (simular fallo)</button>
+            <button class="btn btn-success" onclick="closeCB()">✓ Cerrar (restaurar)</button>
+          </div>
         </div>
-        <div style="padding:16px;background:var(--surface2);border:1px solid var(--border);border-radius:10px;font-size:13px;color:var(--muted);line-height:1.7">
-          <strong style="color:var(--text)">¿Qué hace el Circuit Breaker?</strong><br><br>
-          Cuando está <span style="color:var(--danger)">abierto</span>, el AI Service simula un fallo pero responde con análisis local como degradación aceptable.<br><br>
-          Cuando está <span style="color:var(--success)">cerrado</span>, opera normalmente.
+        <div id="cb-no-access" style="padding:12px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;font-size:13px;color:var(--muted)">
+          🔒 Solo administradores pueden controlar el Circuit Breaker
         </div>
         <div class="response" id="cb-res"></div>
       </div>
@@ -246,19 +254,27 @@
 
 <div id="toast"></div>
 
-<script>
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyAd_x7XxX1WRpqaaySmuTz_nYSH3gB6RCg",
+  authDomain: "paircode-auth.firebaseapp.com",
+  projectId: "paircode-auth",
+  storageBucket: "paircode-auth.firebasestorage.app",
+  messagingSenderId: "582600797667",
+  appId: "1:582600797667:web:f166a94f7065781a6ac4d6"
+};
+
+const firebaseApp = initializeApp(firebaseConfig);
+const auth = getAuth(firebaseApp);
+const googleProvider = new GoogleAuthProvider();
+
 const API = 'http://localhost:8000';
 let currentUser = null;
 let currentToken = null;
-
-function showTab(name) {
-  document.querySelectorAll('.tab').forEach((t,i) => {
-    const tabs = ['auth','sessions','editor','ai'];
-    t.classList.toggle('active', tabs[i] === name);
-  });
-  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-  document.getElementById('panel-' + name).classList.add('active');
-}
+let currentRole = null;
 
 function toast(msg, type='info') {
   const t = document.getElementById('toast');
@@ -274,7 +290,13 @@ function showRes(id, data, isError=false) {
 }
 
 async function apiFetch(path, method='GET', body=null) {
-  const opts = { method, headers: {'Content-Type':'application/json'} };
+  const opts = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(currentToken ? {'Authorization': `Bearer ${currentToken}`} : {})
+    }
+  };
   if (body) opts.body = JSON.stringify(body);
   const r = await fetch(API + path, opts);
   const data = await r.json();
@@ -284,90 +306,220 @@ async function apiFetch(path, method='GET', body=null) {
 
 async function checkServer() {
   try {
-    await apiFetch('/health');
+    await fetch(API + '/health');
     document.getElementById('serverDot').style.background = 'var(--success)';
-    document.getElementById('serverDot').style.boxShadow = '0 0 8px var(--success)';
     document.getElementById('serverStatus').textContent = 'todos los servicios OK';
   } catch(e) {
     document.getElementById('serverDot').style.background = 'var(--danger)';
-    document.getElementById('serverDot').style.boxShadow = '0 0 8px var(--danger)';
-    document.getElementById('serverStatus').textContent = 'sin conexion con el servidor';
+    document.getElementById('serverStatus').textContent = 'sin conexion';
   }
 }
 
-function updateUserChip() {
-  if (!currentUser) return;
-  const chip = document.getElementById('userChip');
-  chip.style.display = 'inline-flex';
-  document.getElementById('userAvatar').textContent = currentUser[0].toUpperCase();
-  document.getElementById('userLabel').textContent = currentUser;
+function updateUI(role) {
+  // Role badge
+  const badge = document.getElementById('roleBadge');
+  badge.textContent = role;
+  badge.className = `role-badge role-${role}`;
+
+  // Circuit breaker — solo admin
+  document.getElementById('cb-controls').style.display = role === 'admin' ? 'block' : 'none';
+  document.getElementById('cb-no-access').style.display = role === 'admin' ? 'none' : 'block';
+
+  // Paneles especiales
+  document.getElementById('teacher-panel').style.display = role === 'teacher' ? 'block' : 'none';
+  document.getElementById('admin-panel').style.display = role === 'admin' ? 'block' : 'none';
+
+  // Scope de sesiones
+  const scope = document.getElementById('sessions-scope');
+  if (role === 'student') scope.textContent = '(tus sesiones)';
+  else if (role === 'teacher') scope.textContent = '(todas las sesiones)';
+  else if (role === 'admin') scope.textContent = '(todas — control total)';
 }
 
-async function register() {
+function updateUserChip(user, role) {
+  const chip = document.getElementById('userChip');
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (user) {
+    chip.style.display = 'inline-flex';
+    logoutBtn.style.display = 'inline-flex';
+    const avatar = document.getElementById('userAvatar');
+    if (user.photoURL) {
+      avatar.innerHTML = `<img src="${user.photoURL}" alt="avatar">`;
+    } else {
+      avatar.textContent = (user.displayName || user.email || '?')[0].toUpperCase();
+    }
+    document.getElementById('userLabel').textContent = user.displayName || user.email.split('@')[0];
+    if (role) updateUI(role);
+  } else {
+    chip.style.display = 'none';
+    logoutBtn.style.display = 'none';
+  }
+}
+
+onAuthStateChanged(auth, (user) => {
+  currentUser = user;
+  if (!user) {
+    currentToken = null;
+    currentRole = null;
+    updateUserChip(null);
+  }
+});
+
+window.showTab = function(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    const tabs = ['auth','sessions','editor','ai'];
+    t.classList.toggle('active', tabs[i] === name);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+}
+
+window.register = async function() {
   const username = document.getElementById('reg-user').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
   const password = document.getElementById('reg-pass').value;
   const role = document.getElementById('reg-role').value;
-  if (!username || !password) { toast('Completa todos los campos','error'); return; }
+  if (!username || !email || !password) { toast('Completa todos los campos','error'); return; }
   try {
-    const data = await apiFetch('/api/auth/register','POST',{username,password,role});
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+    const data = await apiFetch('/api/auth/register','POST',{
+      username, email, firebase_uid: cred.user.uid, role
+    });
     showRes('reg-res', data);
-    toast('Usuario registrado correctamente','success');
-  } catch(e) { showRes('reg-res', e, true); toast('Error al registrar','error'); }
+    toast('Cuenta creada correctamente','success');
+  } catch(e) {
+    const msg = e.code === 'auth/email-already-in-use' ? 'Email ya registrado' :
+                e.code === 'auth/weak-password' ? 'Contraseña muy débil' :
+                e.detail || JSON.stringify(e);
+    showRes('reg-res', {error: msg}, true);
+    toast('Error al registrar','error');
+  }
 }
 
-async function login() {
-  const username = document.getElementById('login-user').value.trim();
+window.login = async function() {
+  const email = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-pass').value;
-  if (!username || !password) { toast('Completa todos los campos','error'); return; }
+  if (!email || !password) { toast('Completa todos los campos','error'); return; }
   try {
-    const data = await apiFetch('/api/auth/login','POST',{username,password});
-    currentUser = data.username;
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    const data = await apiFetch('/api/auth/login','POST',{
+      firebase_uid: cred.user.uid,
+      email: cred.user.email,
+      username: cred.user.displayName || ''
+    });
     currentToken = data.token;
-    updateUserChip();
+    currentRole = data.role;
+    updateUserChip(cred.user, data.role);
     showRes('login-res', data);
-    toast('Bienvenido ' + username,'success');
-  } catch(e) { showRes('login-res', e, true); toast('Credenciales incorrectas','error'); }
+    toast('Bienvenido ' + data.username,'success');
+  } catch(e) {
+    const msg = e.code === 'auth/invalid-credential' ? 'Email o contraseña incorrectos' :
+                e.detail || JSON.stringify(e);
+    showRes('login-res', {error: msg}, true);
+    toast('Error al iniciar sesion','error');
+  }
 }
 
-async function createSession() {
+window.loginGoogle = async function() {
+  try {
+    const result = await signInWithPopup(auth, googleProvider);
+    const firebaseUser = result.user;
+    await apiFetch('/api/auth/register','POST',{
+      username: firebaseUser.displayName || firebaseUser.email.split('@')[0],
+      email: firebaseUser.email,
+      firebase_uid: firebaseUser.uid,
+      role: 'student'
+    });
+    const data = await apiFetch('/api/auth/login','POST',{
+      firebase_uid: firebaseUser.uid,
+      email: firebaseUser.email,
+      username: firebaseUser.displayName || ''
+    });
+    currentToken = data.token;
+    currentRole = data.role;
+    updateUserChip(firebaseUser, data.role);
+    toast('Bienvenido con Google','success');
+  } catch(e) {
+    toast('Error con Google: ' + (e.code || e.detail || ''),'error');
+  }
+}
+
+window.logout = async function() {
+  try { await apiFetch('/api/auth/logout','POST'); } catch(e) {}
+  await signOut(auth);
+  currentToken = null;
+  currentRole = null;
+  updateUserChip(null);
+  toast('Sesion cerrada','info');
+}
+
+window.loadUsers = async function() {
+  try {
+    const data = await apiFetch('/api/auth/users');
+    const container = currentRole === 'admin' ?
+      document.getElementById('admin-users-container') :
+      document.getElementById('users-container');
+    if (!data.users || data.users.length === 0) {
+      container.innerHTML = '<p style="color:var(--muted);font-size:14px">No hay usuarios registrados.</p>';
+      return;
+    }
+    const canDelete = currentRole === 'admin';
+    container.innerHTML = `<table class="users-table">
+      <thead><tr><th>Usuario</th><th>Email</th><th>Rol</th>${canDelete ? '<th>Acción</th>' : ''}</tr></thead>
+      <tbody>${data.users.map(u => `
+        <tr>
+          <td>${u.username}</td>
+          <td>${u.email || '-'}</td>
+          <td><span class="role-badge role-${u.role}">${u.role}</span></td>
+          ${canDelete ? `<td><button class="delete-btn" onclick="deleteUser('${u.username}')">Eliminar</button></td>` : ''}
+        </tr>`).join('')}
+      </tbody>
+    </table>`;
+  } catch(e) {
+    toast(e.detail || 'Sin permiso para ver usuarios','error');
+  }
+}
+
+window.createSession = async function() {
   const name = document.getElementById('sess-name').value.trim();
   const language = document.getElementById('sess-lang').value;
-  const owner = currentUser || 'anonimo';
-  if (!name) { toast('Escribe un nombre para la sesion','error'); return; }
+  const owner = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'anonimo';
+  if (!name) { toast('Escribe un nombre','error'); return; }
   try {
     const data = await apiFetch('/api/sessions','POST',{name,owner,language});
     showRes('sess-res', data);
-    toast('Sesion creada correctamente','success');
+    toast('Sesion creada','success');
     const id = data.session?.id || '';
     if (id) {
       document.getElementById('edit-session-id').value = id;
       document.getElementById('ai-session-id').value = id;
       document.getElementById('join-id').value = id;
     }
-  } catch(e) { showRes('sess-res', e, true); toast('Error al crear sesion','error'); }
+  } catch(e) { showRes('sess-res', e, true); toast(e.detail || 'Error al crear sesion','error'); }
 }
 
-async function joinSession() {
+window.joinSession = async function() {
   const session_id = document.getElementById('join-id').value.trim();
-  const username = currentUser || 'anonimo';
-  if (!session_id) { toast('Ingresa el ID de sesion','error'); return; }
+  const username = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'anonimo';
+  if (!session_id) { toast('Ingresa el ID','error'); return; }
   try {
     const data = await apiFetch('/api/sessions/'+session_id+'/join','POST',{username});
     showRes('join-res', data);
-    toast('Te uniste a la sesion correctamente','success');
+    toast('Te uniste a la sesion','success');
     document.getElementById('edit-session-id').value = session_id;
     document.getElementById('ai-session-id').value = session_id;
-  } catch(e) { showRes('join-res', e, true); toast('Error al unirse','error'); }
+  } catch(e) { showRes('join-res', e, true); toast(e.detail || 'Error','error'); }
 }
 
-async function loadSessions() {
+window.loadSessions = async function() {
   try {
     const data = await apiFetch('/api/sessions');
     const grid = document.getElementById('sessions-grid');
     if (!data.sessions || data.sessions.length === 0) {
-      grid.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:20px 0">No hay sesiones aun. Crea una!</div>';
+      grid.innerHTML = '<div style="color:var(--muted);font-size:14px;padding:20px 0">No hay sesiones. Crea una!</div>';
       return;
     }
+    const isAdmin = currentRole === 'admin';
     grid.innerHTML = data.sessions.map(s => {
       const langClass = {python:'badge-python',javascript:'badge-js',java:'badge-java'}[s.language] || 'badge-other';
       const parts = s.participants ? (typeof s.participants === 'string' ? JSON.parse(s.participants) : s.participants) : [];
@@ -376,76 +528,89 @@ async function loadSessions() {
         <div class="meta">Propietario: ${s.owner} · ${parts.length} participante(s)</div>
         <div class="meta" style="margin-top:4px;font-size:11px;color:var(--muted)">${s.id.substring(0,8)}...</div>
         <span class="badge ${langClass}">${s.language}</span>
+        ${isAdmin ? `<button class="delete-btn" style="margin-top:8px;display:block" onclick="event.stopPropagation();deleteSession('${s.id}')">🗑 Eliminar</button>` : ''}
       </div>`;
     }).join('');
-  } catch(e) { toast('Error al cargar sesiones','error'); }
+  } catch(e) { toast(e.detail || 'Error al cargar sesiones','error'); }
 }
 
-function selectSession(id) {
+window.selectSession = function(id) {
   document.getElementById('edit-session-id').value = id;
   document.getElementById('ai-session-id').value = id;
-  showTab('editor');
-  toast('Sesion seleccionada, ve al Editor','info');
+  window.showTab('editor');
+  toast('Sesion seleccionada','info');
 }
 
-async function loadCode() {
+window.deleteSession = async function(id) {
+  if (!confirm('¿Eliminar esta sesion?')) return;
+  try {
+    await apiFetch('/api/sessions/'+id,'DELETE');
+    toast('Sesion eliminada','success');
+    window.loadSessions();
+  } catch(e) { toast(e.detail || 'Error al eliminar','error'); }
+}
+
+window.deleteUser = async function(username) {
+  toast('Eliminacion de usuarios requiere implementacion en auth-service','info');
+}
+
+window.loadCode = async function() {
   const id = document.getElementById('edit-session-id').value.trim();
-  if (!id) { toast('Ingresa el ID de sesion','error'); return; }
+  if (!id) { toast('Ingresa el ID','error'); return; }
   try {
     const data = await apiFetch('/api/sessions/'+id+'/code');
     document.getElementById('code-editor').value = data.code || '';
     showRes('editor-res', {message:'Codigo cargado',session_id:id});
-    toast('Codigo cargado correctamente','success');
-  } catch(e) { showRes('editor-res', e, true); toast('Error al cargar codigo','error'); }
+    toast('Codigo cargado','success');
+  } catch(e) { showRes('editor-res', e, true); toast('Error','error'); }
 }
 
-async function saveCode() {
+window.saveCode = async function() {
   const session_id = document.getElementById('edit-session-id').value.trim();
   const code = document.getElementById('code-editor').value;
-  const user = currentUser || 'anonimo';
-  if (!session_id) { toast('Ingresa el ID de sesion','error'); return; }
+  const user = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'anonimo';
+  if (!session_id) { toast('Ingresa el ID','error'); return; }
   try {
     const data = await apiFetch('/api/sessions/'+session_id+'/code','PUT',{session_id,user,code});
     showRes('editor-res', data);
-    toast('Codigo guardado correctamente','success');
-  } catch(e) { showRes('editor-res', e, true); toast('Error al guardar','error'); }
+    toast('Codigo guardado','success');
+  } catch(e) { showRes('editor-res', e, true); toast('Error','error'); }
 }
 
-async function analyzeCode() {
+window.analyzeCode = async function() {
   const session_id = document.getElementById('ai-session-id').value.trim();
   const code = document.getElementById('ai-code').value.trim();
   const question = document.getElementById('ai-question').value.trim();
-  const user = currentUser || 'anonimo';
-  if (!code) { toast('Escribe codigo para analizar','error'); return; }
+  const user = currentUser ? (currentUser.displayName || currentUser.email.split('@')[0]) : 'anonimo';
+  if (!code) { toast('Escribe codigo','error'); return; }
   try {
     const data = await apiFetch('/api/ai/analyze','POST',{session_id:session_id||'demo',user,code,language:'python',question:question||null});
     const parts = data.suggestion.split(' | ');
     document.getElementById('ai-suggestions').innerHTML = parts.map(p =>
-      `<div class="suggestion-item">${p}</div>`
-    ).join('');
+      `<div class="suggestion-item">${p}</div>`).join('');
     document.getElementById('ai-result').classList.add('visible');
-    toast('Analisis completado correctamente','success');
-  } catch(e) { toast('Error en analisis de IA','error'); }
+    toast('Analisis completado','success');
+  } catch(e) { toast(e.detail || 'Error en analisis','error'); }
 }
 
-async function openCB() {
+window.openCB = async function() {
   try {
     const data = await apiFetch('/api/ai/circuit-breaker/open','POST');
     document.getElementById('cb-dot').className = 'cb-dot open';
     document.getElementById('cb-label').textContent = 'Abierto — IA en modo degradado';
     showRes('cb-res', data);
-    toast('Circuit breaker abierto, IA en modo degradado','error');
-  } catch(e) { toast('Error','error'); }
+    toast('Circuit breaker abierto','error');
+  } catch(e) { toast(e.detail || 'Sin permiso','error'); }
 }
 
-async function closeCB() {
+window.closeCB = async function() {
   try {
     const data = await apiFetch('/api/ai/circuit-breaker/close','POST');
     document.getElementById('cb-dot').className = 'cb-dot closed';
     document.getElementById('cb-label').textContent = 'Cerrado — IA operativa';
     showRes('cb-res', data);
-    toast('Circuit breaker restaurado, IA operativa','success');
-  } catch(e) { toast('Error','error'); }
+    toast('Circuit breaker restaurado','success');
+  } catch(e) { toast(e.detail || 'Sin permiso','error'); }
 }
 
 checkServer();

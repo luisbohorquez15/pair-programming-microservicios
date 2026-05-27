@@ -1,14 +1,15 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Header
 from pydantic import BaseModel
-import hashlib
 import uuid
 import os
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import httpx
 
 app = FastAPI(title="Auth Service")
 
 DATABASE_URL = os.getenv("DATABASE_URL", "postgresql://pairuser:pairpass@postgres:5432/pairdb")
+FIREBASE_PROJECT_ID = os.getenv("FIREBASE_PROJECT_ID", "paircode-auth")
 
 def get_connection():
     return psycopg2.connect(DATABASE_URL, cursor_factory=RealDictCursor)
@@ -20,7 +21,8 @@ def init_db():
         CREATE TABLE IF NOT EXISTS users (
             id VARCHAR(36) PRIMARY KEY,
             username VARCHAR(100) UNIQUE NOT NULL,
-            password VARCHAR(256) NOT NULL,
+            email VARCHAR(200),
+            firebase_uid VARCHAR(200) UNIQUE,
             role VARCHAR(50) DEFAULT 'student'
         )
     """)
@@ -34,60 +36,81 @@ def startup():
 
 class UserRegister(BaseModel):
     username: str
-    password: str
+    email: str
+    firebase_uid: str
     role: str = "student"
 
 class UserLogin(BaseModel):
-    username: str
-    password: str
+    firebase_uid: str
+    email: str
+    username: str = ""
 
-def hash_password(password: str) -> str:
-    return hashlib.sha256(password.encode()).hexdigest()
+async def verify_firebase_token(id_token: str) -> dict:
+    url = f"https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=AIzaSyAd_x7XxX1WRpqaaySmuTz_nYSH3gB6RCg"
+    async with httpx.AsyncClient() as client:
+        response = await client.post(url, json={"idToken": id_token})
+        if response.status_code != 200:
+            raise HTTPException(status_code=401, detail="Token de Firebase inválido")
+        data = response.json()
+        if "users" not in data or len(data["users"]) == 0:
+            raise HTTPException(status_code=401, detail="Usuario no encontrado en Firebase")
+        return data["users"][0]
 
 @app.get("/health")
 def health_check():
-    return {"status": "ok", "service": "auth-service"}
+    return {"status": "ok", "service": "auth-service", "auth_provider": "firebase"}
 
 @app.post("/auth/register")
-def register(user: UserRegister):
+async def register(user: UserRegister):
     conn = get_connection()
     cur = conn.cursor()
+    cur.execute("SELECT id FROM users WHERE firebase_uid = %s", (user.firebase_uid,))
+    existing = cur.fetchone()
+    if existing:
+        cur.close()
+        conn.close()
+        return {"message": "Usuario ya existe", "username": user.username}
     cur.execute("SELECT id FROM users WHERE username = %s", (user.username,))
     if cur.fetchone():
         cur.close()
         conn.close()
-        raise HTTPException(status_code=400, detail="Usuario ya existe")
+        raise HTTPException(status_code=400, detail="Nombre de usuario ya en uso")
     user_id = str(uuid.uuid4())
     cur.execute(
-        "INSERT INTO users (id, username, password, role) VALUES (%s, %s, %s, %s)",
-        (user_id, user.username, hash_password(user.password), user.role)
+        "INSERT INTO users (id, username, email, firebase_uid, role) VALUES (%s, %s, %s, %s, %s)",
+        (user_id, user.username, user.email, user.firebase_uid, user.role)
     )
     conn.commit()
     cur.close()
     conn.close()
-    return {"message": "Usuario registrado exitosamente", "username": user.username}
+    return {"message": "Usuario registrado exitosamente", "username": user.username, "role": user.role}
 
 @app.post("/auth/login")
-def login(user: UserLogin):
+async def login(user: UserLogin):
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT * FROM users WHERE username = %s", (user.username,))
+    cur.execute("SELECT * FROM users WHERE firebase_uid = %s", (user.firebase_uid,))
     stored = cur.fetchone()
     cur.close()
     conn.close()
     if not stored:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-    if stored["password"] != hash_password(user.password):
-        raise HTTPException(status_code=401, detail="Contraseña incorrecta")
+        raise HTTPException(status_code=404, detail="Usuario no encontrado en el sistema")
     token = str(uuid.uuid4())
-    return {"message": "Login exitoso", "token": token, "username": user.username, "role": stored["role"]}
+    return {
+        "message": "Login exitoso",
+        "token": token,
+        "username": stored["username"],
+        "email": stored["email"],
+        "role": stored["role"],
+        "auth_provider": "firebase"
+    }
 
 @app.get("/auth/users")
 def get_users():
     conn = get_connection()
     cur = conn.cursor()
-    cur.execute("SELECT username, role FROM users")
+    cur.execute("SELECT username, email, role FROM users")
     users = cur.fetchall()
     cur.close()
     conn.close()
-    return {"users": [{"username": u["username"], "role": u["role"]} for u in users]}
+    return {"users": [{"username": u["username"], "email": u["email"], "role": u["role"]} for u in users]}
